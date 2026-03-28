@@ -51,6 +51,7 @@ default-groups = ["dev"]
 target-version = "py311"
 line-length = 100
 src = ["src", "tests"]
+extend-exclude = [".agents"]
 
 [tool.ruff.lint]
 select = [
@@ -66,7 +67,6 @@ select = [
   "PLR0911",
   "PLR0912",
   "PLR0913",
-  "PLR0914",
   "PLR0915",
 ]
 ignore = []

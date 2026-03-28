@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import argparse
 import ast
+from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Iterator, Sequence
 
 _DEFAULT_MAX_PUBLIC_API = 7
 _DEFAULT_MAX_MODULE_LINES = 350
@@ -12,7 +12,7 @@ _DEFAULT_MIN_DEPTH_RATIO = 8.0
 _DEFAULT_MIN_LINES_FOR_RATIO = 24
 _DISABLE_MARKER = "deep-modules: disable"
 
-__all__ = ["Issue", "ModuleStats", "analyse_source", "find_issues", "run", "main"]
+__all__ = ["Issue", "ModuleStats", "analyse_source", "find_issues", "main", "run"]
 
 
 @dataclass(frozen=True)
@@ -59,7 +59,10 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--max-module-lines",
         type=int,
         default=_DEFAULT_MAX_MODULE_LINES,
-        help=f"Maximum non-blank, non-comment lines per module (default: {_DEFAULT_MAX_MODULE_LINES}).",
+        help=(
+            "Maximum non-blank, non-comment lines per module "
+            f"(default: {_DEFAULT_MAX_MODULE_LINES})."
+        ),
     )
     parser.add_argument(
         "--min-depth-ratio",
@@ -95,32 +98,45 @@ def has_disable_marker(source: str) -> bool:
     return _DISABLE_MARKER in head
 
 
+def _normalize_all_value(value: object) -> tuple[str, ...] | None:
+    if not isinstance(value, (list, tuple, set)):
+        return None
+    if not all(isinstance(item, str) for item in value):
+        return None
+    return tuple(sorted(set(value)))
+
+
+def _extract_assigned_all_value(node: ast.Assign | ast.AnnAssign) -> object | None:
+    try:
+        return ast.literal_eval(node.value)
+    except (ValueError, TypeError):
+        return None
+
+
 def extract_explicit_all(module: ast.Module) -> tuple[str, ...] | None:
     for node in module.body:
         if isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "__all__":
-                    try:
-                        value = ast.literal_eval(node.value)
-                    except (ValueError, TypeError):
-                        return None
-                    if isinstance(value, (list, tuple, set)) and all(
-                        isinstance(item, str) for item in value
-                    ):
-                        return tuple(sorted(set(value)))
-                    return None
-        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.target.id == "__all__":
-            try:
-                value = ast.literal_eval(node.value)
-            except (ValueError, TypeError):
-                return None
-            if isinstance(value, (list, tuple, set)) and all(isinstance(item, str) for item in value):
-                return tuple(sorted(set(value)))
-            return None
+            targets = [
+                target
+                for target in node.targets
+                if isinstance(target, ast.Name) and target.id == "__all__"
+            ]
+            if targets:
+                value = _extract_assigned_all_value(node)
+                return _normalize_all_value(value)
+        if (
+            isinstance(node, ast.AnnAssign)
+            and isinstance(node.target, ast.Name)
+            and node.target.id == "__all__"
+        ):
+            value = _extract_assigned_all_value(node)
+            return _normalize_all_value(value)
     return None
 
 
-def collect_public_names(module: ast.Module, explicit_all: tuple[str, ...] | None) -> tuple[str, ...]:
+def collect_public_names(
+    module: ast.Module, explicit_all: tuple[str, ...] | None
+) -> tuple[str, ...]:
     if explicit_all is not None:
         return explicit_all
 
@@ -200,7 +216,11 @@ def find_issues(
             )
         )
 
-    if public_api_size > 0 and stats.sloc >= min_lines_for_ratio and stats.depth_ratio < min_depth_ratio:
+    if (
+        public_api_size > 0
+        and stats.sloc >= min_lines_for_ratio
+        and stats.depth_ratio < min_depth_ratio
+    ):
         issues.append(
             Issue(
                 path=stats.path,
