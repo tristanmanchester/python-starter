@@ -20,6 +20,7 @@ dist/
 *.egg-info/
 .eggs/
 .marimo/
+notebooks/__marimo__/
 .ipynb_checkpoints/
 runs/
 mlruns/

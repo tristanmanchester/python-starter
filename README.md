@@ -57,6 +57,16 @@ uv sync --extra notebook
 uv run marimo edit notebooks/scratch.py
 ```
 
+If you want a general notebook workspace with the file browser, start marimo
+from the repo root with watch mode enabled:
+
+```bash
+uv run marimo edit --watch
+```
+
+This works well with an external editor: you can edit notebook files in
+Sublime Text, VS Code, or another editor and see the changes appear in marimo.
+
 Use notebooks for exploration; promote stable logic into `src/`.
 
 ## Why this template is agent-friendly
@@ -105,4 +115,3 @@ Put that comment near the top of a file if a module is intentionally small-and-w
 - Keep modules small enough to read in one pass.
 - Prefer explicit `__all__` in public-facing modules.
 - If the repo grows, `docs/importlinter.example.ini` is a starting point for stricter architectural rules.
-
