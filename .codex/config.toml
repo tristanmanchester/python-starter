@@ -1,0 +1,112 @@
+model = "gpt-5.4"
+review_model = "gpt-5.4"
+model_provider = "openai"
+service_tier = "fast"
+model_reasoning_effort = "xhigh"
+plan_mode_reasoning_effort = "xhigh"
+model_reasoning_summary = "detailed"
+model_verbosity = "high"
+personality = "pragmatic"
+
+tool_output_token_limit = 25000
+
+approval_policy = "never"
+allow_login_shell = true
+sandbox_mode = "danger-full-access"
+
+developer_instructions = """
+You are operating in a coding environment that may be used for live technical assessments, interviews, or time-boxed engineering tasks.
+
+Primary goal:
+- Solve the task correctly, cleanly, and efficiently.
+- Optimise for the smallest robust solution that clearly demonstrates engineering judgment.
+
+Execution rules:
+- Start with a short plan for non-trivial work.
+- Read the repo instructions and existing code before making broad changes.
+- Prefer small diffs, explicit reasoning, and fast validation loops.
+- Avoid speculative abstraction, framework churn, premature generalisation, and giant files.
+- Keep interfaces small and implementations deep.
+- Use the repo's package manager, lint, test, and type-check commands.
+- Add or update focused tests when behaviour changes.
+- Before finishing, run the relevant validation commands or say exactly what could not be run.
+- Do not leave behind obvious code smells: duplicated logic, dead helpers, mystery globals, or monolithic do-everything modules.
+- When blocked on ambiguity, state assumptions briefly and proceed unless the task is impossible without clarification.
+"""
+
+hide_agent_reasoning = false
+show_raw_agent_reasoning = true
+disable_paste_burst = true
+
+check_for_update_on_startup = true
+web_search = "live"
+suppress_unstable_features_warning = true
+
+project_doc_max_bytes = 131072
+project_doc_fallback_filenames = ["AGENT.md", "AGENTS.MD", "CODEX.md", ".agents.md", "TEAM_GUIDE.md"]
+project_root_markers = [".git", ".hg", ".sl", "pyproject.toml", "uv.lock"]
+
+cli_auth_credentials_store = "auto"
+mcp_oauth_credentials_store = "auto"
+
+[agents]
+max_threads = 24
+max_depth = 4
+job_max_runtime_seconds = 14400
+
+[sandbox_workspace_write]
+writable_roots = []
+network_access = true
+exclude_tmpdir_env_var = false
+exclude_slash_tmp = false
+
+[shell_environment_policy]
+inherit = "all"
+ignore_default_excludes = false
+exclude = []
+set = {}
+include_only = []
+experimental_use_profile = true
+
+[history]
+persistence = "save-all"
+max_bytes = 104857600
+
+[tui]
+notifications = true
+notification_method = "auto"
+animations = true
+show_tooltips = false
+alternate_screen = "auto"
+
+[analytics]
+enabled = true
+
+[feedback]
+enabled = true
+
+[notice]
+hide_full_access_warning = true
+
+[features]
+apps = true
+enable_request_compression = true
+fast_mode = true
+multi_agent = true
+personality = true
+prevent_idle_sleep = true
+shell_snapshot = true
+shell_tool = true
+skill_mcp_dependency_install = true
+smart_approvals = true
+undo = true
+unified_exec = true
+
+[tools]
+view_image = true
+web_search = { context_size = "high" }
+
+[apps._default]
+enabled = true
+destructive_enabled = true
+open_world_enabled = true

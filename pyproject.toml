@@ -1,0 +1,93 @@
+[project]
+name = "agent-ready-python-starter"
+version = "0.1.0"
+description = "Minimal Python starter repo for agent-assisted coding, experiments, and interview tasks."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = []
+
+[project.scripts]
+check-deep-modules = "agent_ready_python_starter.deep_modules:main"
+
+[project.optional-dependencies]
+analysis = [
+  "numpy>=2.0",
+  "pandas>=2.2",
+  "matplotlib>=3.8",
+]
+ml = [
+  "torch>=2.4",
+  "torchvision>=0.19",
+  "tensorboard>=2.17",
+]
+notebook = [
+  "marimo>=0.14.0",
+]
+architecture = [
+  "import-linter>=1.13.0",
+  "radon>=6.0.1",
+]
+
+[dependency-groups]
+lint = [
+  "ruff>=0.13.0",
+]
+test = [
+  "pytest>=8.4.0",
+]
+dev = [
+  { include-group = "lint" },
+  { include-group = "test" },
+]
+
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "I",
+  "B",
+  "UP",
+  "SIM",
+  "TID",
+  "C90",
+  "RUF",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0914",
+  "PLR0915",
+]
+ignore = []
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-returns = 6
+max-branches = 10
+max-args = 6
+max-locals = 12
+max-statements = 25
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_ready_python_starter"]
